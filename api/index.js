@@ -1,3 +1,4 @@
+import "express-async-errors";
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -25,7 +26,10 @@ try {
 
 // Model Initialization
 import "./models/user.model.js";
+import errorHandler from "./utils/errorHandler.js";
 
 app.use("/api/v1/users/register", registerUser);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server started on port: ${PORT}`));
