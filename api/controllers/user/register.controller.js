@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const registerUser = async (req, res) => {
   const User = mongoose.model("User");
@@ -15,11 +16,19 @@ const registerUser = async (req, res) => {
 
   if (isExistingUser) throw Error("User with this email already exist");
 
-  const user = await User.create({ email, password });
+  // Hash password
+  const hashedPassword = await bcrypt.hash(password, 12);
+
+  const user = await User.create({ email, password: hashedPassword });
+
+  // Remove sensitive fields in response
+  const sanitizedUser = user.toObject();
+
+  delete sanitizedUser.password;
 
   res.status(201).json({
     message: "Registration successful",
-    data: { user },
+    data: { user: sanitizedUser },
   });
 };
 
