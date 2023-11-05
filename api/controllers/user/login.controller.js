@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import generateAccessToken from "../../utils/accessToken.js";
 
 const handleLogin = async (req, res) => {
   const { email, password } = req.body;
 
-  const User = mongoose.Model("User");
+  const User = mongoose.model("User");
 
   // Verify user input
   if (!email) throw Error("Email is required");
@@ -21,7 +24,28 @@ const handleLogin = async (req, res) => {
 
   if (!user) throw Error("No not found");
 
-  //   if(user.)
+  // Validate Password
+  const isValidPassword = await bcrypt.compare(password, user.password);
+
+  if (!isValidPassword) throw Error("Email or password incorrect");
+
+  // Remove sensitive data from response eg. hashed password
+  const sanitizedUser = user.toObject();
+  delete sanitizedUser.password;
+
+  // Generate Access token
+  const accessToken = await generateAccessToken(sanitizedUser);
+
+  // Decode token
+  const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET);
+
+  // Assign decoded user data to user req
+  req.user = decodedToken;
+
+  res.status(200).json({
+    message: "Login successful",
+    data: { user: sanitizedUser, accessToken },
+  });
 };
 
 export default handleLogin;

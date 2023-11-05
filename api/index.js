@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 
-import registerUser from "./controllers/user/register.controller.js";
+import errorHandler from "./utils/errorHandler.js";
+import userRouter from "./routes/users.routes.js";
 
 dotenv.config();
 
@@ -30,9 +31,8 @@ try {
 
 // Model Initialization
 import "./models/user.model.js";
-import errorHandler from "./utils/errorHandler.js";
 
-app.use("/api/v1/users/register", registerUser);
+app.use("/api/v1/users", userRouter);
 
 app.use(errorHandler);
 

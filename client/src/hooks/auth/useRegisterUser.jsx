@@ -5,8 +5,6 @@ const useRegisterUser = () => {
   //   const queryClient = useQueryClient();
 
   const registerUser = async (userData) => {
-    console.log("User Data", userData);
-
     const res = await axios(
       `${import.meta.env.VITE_SERVER_BASE_URL}/api/v1/users/register`,
       {
