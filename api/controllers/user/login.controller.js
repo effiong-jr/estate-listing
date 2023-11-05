@@ -22,7 +22,7 @@ const handleLogin = async (req, res) => {
 
   const user = await User.findOne({ email });
 
-  if (!user) throw Error("No not found");
+  if (!user) throw Error("User not found");
 
   // Validate Password
   const isValidPassword = await bcrypt.compare(password, user.password);
@@ -34,18 +34,17 @@ const handleLogin = async (req, res) => {
   delete sanitizedUser.password;
 
   // Generate Access token
-  const accessToken = await generateAccessToken(sanitizedUser);
+  const token = await generateAccessToken(sanitizedUser);
 
-  // Decode token
-  const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET);
-
-  // Assign decoded user data to user req
-  req.user = decodedToken;
-
-  res.status(200).json({
-    message: "Login successful",
-    data: { user: sanitizedUser, accessToken },
-  });
+  res
+    .status(200)
+    .cookie("accessToken", `Bearer ${token}`, {
+      expires: new Date(Date.now() + 60 * 60),
+    })
+    .json({
+      message: "Login successful",
+      data: { user: sanitizedUser },
+    });
 };
 
 export default handleLogin;

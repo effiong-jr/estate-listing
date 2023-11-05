@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 
 import generateAccessToken from "../../utils/accessToken.js";
 
@@ -29,18 +28,17 @@ const registerUser = async (req, res) => {
   delete sanitizedUser.password;
 
   // Generate access token
-  const accessToken = await generateAccessToken(user);
+  const token = await generateAccessToken(user);
 
-  //verity token
-  const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET);
-
-  // assign verified user data to req.user
-  req.user = decodedToken;
-
-  res.status(201).json({
-    message: "Registration successful",
-    data: { user: sanitizedUser, accessToken },
-  });
+  res
+    .status(201)
+    .cookie("accessToken", `Bearer ${token}`, {
+      expires: new Date(Date.now() + 60 * 60),
+    })
+    .json({
+      message: "Registration successful",
+      data: { user: sanitizedUser },
+    });
 };
 
 export default registerUser;

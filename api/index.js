@@ -2,6 +2,7 @@ import "express-async-errors";
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import helmet from "helmet";
 import cors from "cors";
 
 import errorHandler from "./utils/errorHandler.js";
@@ -13,6 +14,8 @@ const app = express();
 app.use(express.json());
 
 app.use(cors());
+
+app.use(helmet());
 
 const PORT = process.env.PORT || 8000;
 
