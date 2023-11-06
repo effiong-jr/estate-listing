@@ -31,10 +31,8 @@ const registerUser = async (req, res) => {
   const token = await generateAccessToken(user);
 
   res
+    .cookie("accessToken", token)
     .status(201)
-    .cookie("accessToken", `Bearer ${token}`, {
-      expires: new Date(Date.now() + 60 * 60),
-    })
     .json({
       message: "Registration successful",
       data: { user: sanitizedUser },

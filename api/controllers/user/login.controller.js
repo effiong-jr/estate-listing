@@ -37,10 +37,8 @@ const handleLogin = async (req, res) => {
   const token = await generateAccessToken(sanitizedUser);
 
   res
+    .cookie("accessToken", token)
     .status(200)
-    .cookie("accessToken", `Bearer ${token}`, {
-      expires: new Date(Date.now() + 60 * 60),
-    })
     .json({
       message: "Login successful",
       data: { user: sanitizedUser },

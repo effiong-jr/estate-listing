@@ -1,8 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 
+import { setCurrentUser } from "../../redux/features/user";
 const useRegisterUser = () => {
   //   const queryClient = useQueryClient();
+
+  const dispatch = useDispatch();
 
   const registerUser = async (userData) => {
     const res = await axios(
@@ -18,6 +22,11 @@ const useRegisterUser = () => {
 
   const registerUserMutation = useMutation({
     mutationFn: async (data) => await registerUser(data),
+    onSuccess: (res) => {
+      console.log(res);
+      const { user } = res.data.data;
+      dispatch(setCurrentUser(user));
+    },
   });
 
   return registerUserMutation;

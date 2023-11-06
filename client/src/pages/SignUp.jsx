@@ -17,7 +17,7 @@ const SignUp = () => {
   };
 
   if (isSuccess) {
-    return <Navigate to="/sign-in" />;
+    return <Navigate to="/" />;
   }
 
   return (
