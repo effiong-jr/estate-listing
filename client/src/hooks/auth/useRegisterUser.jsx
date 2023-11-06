@@ -23,7 +23,6 @@ const useRegisterUser = () => {
   const registerUserMutation = useMutation({
     mutationFn: async (data) => await registerUser(data),
     onSuccess: (res) => {
-      console.log(res);
       const { user } = res.data.data;
       dispatch(setCurrentUser(user));
     },
