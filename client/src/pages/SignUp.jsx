@@ -2,6 +2,7 @@ import { Link, Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 // import axios from "axios";
 import useRegisterUser from "../hooks/auth/useRegisterUser";
+import OAuth from "../components/OAuth";
 
 const SignUp = () => {
   const { mutate, error, isPending, isSuccess } = useRegisterUser();
@@ -72,6 +73,8 @@ const SignUp = () => {
         >
           {isPending ? "Loading..." : "Sign up"}
         </button>
+
+        <OAuth />
 
         {error && (
           <p className="text-xs text-red-600">

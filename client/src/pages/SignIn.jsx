@@ -2,6 +2,7 @@ import { Link, Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 // import axios from "axios";
 import useLoginUser from "../hooks/auth/useLoginUser";
+import OAuth from "../components/OAuth";
 
 const Login = () => {
   const { mutate, error, isPending, isSuccess } = useLoginUser();
@@ -57,6 +58,8 @@ const Login = () => {
         >
           {isPending ? "Loading..." : "Login"}
         </button>
+
+        <OAuth />
 
         {error && (
           <p className="text-xs text-red-600">
