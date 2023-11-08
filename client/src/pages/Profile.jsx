@@ -43,9 +43,7 @@ const Profile = () => {
         </button>
 
         <div className="text-red-700 flex justify-between w-full">
-          <span type="button" className="cursor-pointer">
-            Delete Account
-          </span>
+          <span className="cursor-pointer">Delete Account</span>
           <span className="cursor-pointer">Sign out</span>
         </div>
       </form>
