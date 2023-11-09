@@ -1,14 +1,59 @@
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+
+import { app } from "../utils/firebase";
 
 const Profile = () => {
+  const [file, setFile] = useState(null);
+  const [uploadPercentage, setUploadPercentate] = useState(0);
+  const [fileUploadError, setFileUploadError] = useState(false);
+  const [imageURL, setImageURL] = useState("");
+
   const { currentUser } = useSelector((state) => state.user);
 
   const { register, handleSubmit } = useForm();
 
-  const handleFormSubmit = () => {};
+  const fileRef = useRef(null);
 
-  console.log({ ...register });
+  useEffect(() => {
+    if (file) {
+      handleUpload(file);
+    }
+  }, [file]);
+
+  const handleUpload = (file) => {
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + file.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        setFileUploadError(false);
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadPercentate(Math.round(progress));
+      },
+      (error) => {
+        console.log(error);
+        setFileUploadError(true);
+      },
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        setImageURL(downloadURL);
+      }
+    );
+  };
+
+  const handleFormSubmit = () => {};
 
   return (
     <div>
@@ -18,10 +63,32 @@ const Profile = () => {
         className="flex flex-col items-center max-w-lg mx-auto gap-4"
         onSubmit={handleSubmit(handleFormSubmit)}
       >
+        <input
+          onChange={(e) => setFile(e.target.files[0])}
+          type="file"
+          ref={fileRef}
+          hidden
+          accept="image/*"
+        />
         <img
-          src={currentUser?.avatar}
+          src={imageURL || currentUser?.avatar}
+          onClick={() => fileRef.current.click()}
           className="rounded-full object-cover text-center w-24 h-24 mt-2"
         />
+
+        <p>
+          {fileUploadError ? (
+            <span className="text-red-700 text-12">
+              Image Upload Error (Image must be less than 2mb)
+            </span>
+          ) : uploadPercentage > 0 && uploadPercentage < 100 ? (
+            <span className="text-slate-700 text-sm">{`Uploading... ${uploadPercentage}%`}</span>
+          ) : uploadPercentage === 100 ? (
+            <span className="text-green-700 text-sm">
+              Image uploaded successfully!
+            </span>
+          ) : null}
+        </p>
 
         <input
           type="email"
