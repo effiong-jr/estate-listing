@@ -22,8 +22,8 @@ const useLoginUser = () => {
   const loginUserMutation = useMutation({
     mutationFn: async (data) => await loginUser(data),
     onSuccess: (res) => {
-      const { user } = res.data.data;
-      dispatch(setCurrentUser(user));
+      const { data } = res.data;
+      dispatch(setCurrentUser(data));
     },
   });
 

@@ -39,9 +39,9 @@ const Header = () => {
             </Link>
 
             <Link to={"/profile"}>
-              {currentUser ? (
+              {currentUser?.userDetails ? (
                 <img
-                  src={currentUser.avatar}
+                  src={currentUser?.userDetails.avatar}
                   className="h-7 w-7 rounded-full object-cover"
                   alt="avatar"
                 />

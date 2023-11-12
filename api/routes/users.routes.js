@@ -3,6 +3,7 @@ import registerUser from "../controllers/user/register.controller.js";
 import handleLogin from "../controllers/user/login.controller.js";
 import auth from "../middlewares/auth.js";
 import handleAuthWithGoogle from "../controllers/user/authWithGoogle.controllers.js";
+import handleUpdateUser from "../controllers/user/updateUser.controller.js";
 
 const userRouter = express.Router();
 
@@ -21,5 +22,7 @@ userRouter.get("/dashboard", (req, res) => {
     data: {},
   });
 });
+
+userRouter.post("/update", handleUpdateUser);
 
 export default userRouter;

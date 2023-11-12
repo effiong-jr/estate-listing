@@ -21,7 +21,7 @@ const useGoogle = () => {
     mutationFn: handleAuthWithGoogle,
     onSuccess: (data) => {
       // Get user details response from DB and setCurrentUser on redux
-      dispatch(setCurrentUser(data?.data?.user));
+      dispatch(setCurrentUser(data?.data));
     },
   });
 

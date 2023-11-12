@@ -34,15 +34,12 @@ const handleLogin = async (req, res) => {
   delete sanitizedUser.password;
 
   // Generate Access token
-  const token = await generateAccessToken(sanitizedUser);
+  const accessToken = await generateAccessToken(sanitizedUser);
 
-  res
-    .cookie("accessToken", token)
-    .status(200)
-    .json({
-      message: "Login successful",
-      data: { user: sanitizedUser },
-    });
+  res.status(200).json({
+    message: "Login successful",
+    data: { userUserDetails: sanitizedUser, accessToken },
+  });
 };
 
 export default handleLogin;

@@ -10,6 +10,8 @@ import {
 
 import { app } from "../utils/firebase";
 
+import useUpdateUser from "../hooks/user/useUpdateUser";
+
 const Profile = () => {
   const [file, setFile] = useState(null);
   const [uploadPercentage, setUploadPercentate] = useState(0);
@@ -17,6 +19,8 @@ const Profile = () => {
   const [imageURL, setImageURL] = useState("");
 
   const { currentUser } = useSelector((state) => state.user);
+
+  const { mutate } = useUpdateUser();
 
   const { register, handleSubmit } = useForm();
 
@@ -53,7 +57,9 @@ const Profile = () => {
     );
   };
 
-  const handleFormSubmit = () => {};
+  const handleFormSubmit = (formData) => {
+    mutate({ imageURL, ...formData });
+  };
 
   return (
     <div>
@@ -71,7 +77,7 @@ const Profile = () => {
           accept="image/*"
         />
         <img
-          src={imageURL || currentUser?.avatar}
+          src={imageURL || currentUser?.userDetails?.avatar}
           onClick={() => fileRef.current.click()}
           className="rounded-full object-cover text-center w-24 h-24 mt-2"
         />
@@ -94,7 +100,7 @@ const Profile = () => {
           type="email"
           placeholder="Email"
           className="p-3 w-full rounded-lg"
-          defaultValue={currentUser?.email}
+          defaultValue={currentUser?.userDetails?.email}
           {...register("email")}
         />
 

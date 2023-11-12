@@ -28,15 +28,12 @@ const registerUser = async (req, res) => {
   delete sanitizedUser.password;
 
   // Generate access token
-  const token = await generateAccessToken(user);
+  const accessToken = await generateAccessToken(user);
 
-  res
-    .cookie("accessToken", token)
-    .status(201)
-    .json({
-      message: "Registration successful",
-      data: { user: sanitizedUser },
-    });
+  res.status(201).json({
+    message: "Registration successful",
+    data: { userDetails: sanitizedUser, accessToken },
+  });
 };
 
 export default registerUser;
