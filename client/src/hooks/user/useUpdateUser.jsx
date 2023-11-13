@@ -1,9 +1,12 @@
-import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useMutation } from "@tanstack/react-query";
+import { useSelector, useDispatch } from "react-redux";
+import { setCurrentUser } from "../../redux/features/user";
 
 const useUpdateUser = () => {
   const { currentUser } = useSelector((state) => state.user);
+
+  const dispatch = useDispatch();
 
   const handleUpdateUserDetails = async (userData) => {
     const res = await axios({
@@ -22,7 +25,11 @@ const useUpdateUser = () => {
 
   const updateUser = useMutation({
     mutationFn: async (userData) => await handleUpdateUserDetails(userData),
-    onSuccess: (data) => console.log(data),
+    onSuccess: (res) => {
+      const { data } = res.data;
+
+      dispatch(setCurrentUser(data));
+    },
   });
 
   return updateUser;

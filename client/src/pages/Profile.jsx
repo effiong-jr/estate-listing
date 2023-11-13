@@ -20,7 +20,7 @@ const Profile = () => {
 
   const { currentUser } = useSelector((state) => state.user);
 
-  const { mutate } = useUpdateUser();
+  const { mutate, isPending, isError, error } = useUpdateUser();
 
   const { register, handleSubmit } = useForm();
 
@@ -111,14 +111,19 @@ const Profile = () => {
           {...register("password")}
         />
 
-        <button className="bg-slate-700 w-full p-2 text-white uppercase rounded-lg hover:bg-slate-500 disabled:bg-slate-300 disabled:hover:cursor-not-allowed">
-          update
+        <button
+          className="bg-slate-700 w-full p-2 text-white uppercase rounded-lg hover:bg-slate-500 disabled:bg-slate-300 disabled:hover:cursor-not-allowed"
+          disabled={isPending}
+        >
+          {isPending ? "Loading..." : "Update"}
         </button>
 
         <div className="text-red-700 flex justify-between w-full">
           <span className="cursor-pointer">Delete Account</span>
           <span className="cursor-pointer">Sign out</span>
         </div>
+
+        <p className="text-red-700 text-sm">{isError ? error.message : null}</p>
       </form>
     </div>
   );
