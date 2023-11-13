@@ -11,6 +11,7 @@ import {
 import { app } from "../utils/firebase";
 
 import useUpdateUser from "../hooks/user/useUpdateUser";
+import useDeleteAccount from "../hooks/user/useDeleteAccount";
 
 const Profile = () => {
   const [file, setFile] = useState(null);
@@ -21,6 +22,8 @@ const Profile = () => {
   const { currentUser } = useSelector((state) => state.user);
 
   const { mutate, isPending, isError, error } = useUpdateUser();
+  const { mutate: mutateDeleteUser, isPending: isDeletingUser } =
+    useDeleteAccount();
 
   const { register, handleSubmit } = useForm();
 
@@ -59,6 +62,10 @@ const Profile = () => {
 
   const handleFormSubmit = (formData) => {
     mutate({ imageURL, ...formData });
+  };
+
+  const handleDeleteAccount = () => {
+    mutateDeleteUser();
   };
 
   return (
@@ -119,7 +126,13 @@ const Profile = () => {
         </button>
 
         <div className="text-red-700 flex justify-between w-full">
-          <span className="cursor-pointer">Delete Account</span>
+          <span
+            className="cursor-pointer"
+            onClick={handleDeleteAccount}
+            disabled={isDeletingUser}
+          >
+            {isDeletingUser ? "Deleting account..." : "Delete Account"}
+          </span>
           <span className="cursor-pointer">Sign out</span>
         </div>
 

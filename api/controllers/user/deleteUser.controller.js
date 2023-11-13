@@ -6,7 +6,7 @@ const handleDeleteUser = async (req, res) => {
   await User.findByIdAndDelete(req.user._id);
 
   res.status(200).json({
-    message: "User deleted successfully",
+    message: "User account deleted successfully",
   });
 };
 
