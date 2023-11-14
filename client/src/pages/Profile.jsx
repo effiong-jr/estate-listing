@@ -12,6 +12,7 @@ import { app } from "../utils/firebase";
 
 import useUpdateUser from "../hooks/user/useUpdateUser";
 import useDeleteAccount from "../hooks/user/useDeleteAccount";
+import useLogout from "../hooks/auth/useLogout";
 
 const Profile = () => {
   const [file, setFile] = useState(null);
@@ -24,6 +25,7 @@ const Profile = () => {
   const { mutate, isPending, isError, error } = useUpdateUser();
   const { mutate: mutateDeleteUser, isPending: isDeletingUser } =
     useDeleteAccount();
+  const { mutate: mutateLogout } = useLogout();
 
   const { register, handleSubmit } = useForm();
 
@@ -66,6 +68,10 @@ const Profile = () => {
 
   const handleDeleteAccount = () => {
     mutateDeleteUser();
+  };
+
+  const handleSignOut = () => {
+    mutateLogout();
   };
 
   return (
@@ -133,7 +139,9 @@ const Profile = () => {
           >
             {isDeletingUser ? "Deleting account..." : "Delete Account"}
           </span>
-          <span className="cursor-pointer">Sign out</span>
+          <span className="cursor-pointer" onClick={handleSignOut}>
+            Logout
+          </span>
         </div>
 
         <p className="text-red-700 text-sm">

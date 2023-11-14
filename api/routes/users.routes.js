@@ -5,7 +5,7 @@ import auth from "../middlewares/auth.js";
 import handleAuthWithGoogle from "../controllers/user/authWithGoogle.controllers.js";
 import handleUpdateUser from "../controllers/user/updateUser.controller.js";
 import handleDeleteUser from "../controllers/user/deleteUser.controller.js";
-import handleSignOut from "../controllers/user/signout.controller.js";
+import handleLogout from "../controllers/user/logout.controller.js";
 
 const userRouter = express.Router();
 
@@ -27,6 +27,6 @@ userRouter.get("/dashboard", (req, res) => {
 
 userRouter.post("/update", handleUpdateUser);
 userRouter.delete("/delete", handleDeleteUser);
-userRouter.post("/signOut", handleSignOut);
+userRouter.post("/logout", handleLogout);
 
 export default userRouter;
