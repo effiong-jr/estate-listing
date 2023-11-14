@@ -1,18 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 
 import { setCurrentUser } from "../../redux/features/user";
+import axiosInstance from "../../utils/axios";
 
 const useLoginUser = () => {
   const dispatch = useDispatch();
 
   const loginUser = async (userData) => {
-    const res = await axios({
-      url: `${import.meta.env.VITE_SERVER_BASE_URL}/api/v1/users/login`,
+    const res = await axiosInstance({
+      url: `/users/login`,
       method: "POST",
       data: userData,
-      withCredentials: true,
     });
 
     return res;

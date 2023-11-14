@@ -1,22 +1,15 @@
-import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
-import {
-  // useSelector,
-  useDispatch,
-} from "react-redux";
+import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../../redux/features/user";
+import axiosInstance from "../../utils/axios";
 
 const useUpdateUser = () => {
-  // const { currentUser } = useSelector((state) => state.user);
-
   const dispatch = useDispatch();
 
   const handleUpdateUserDetails = async (userData) => {
-    const res = await axios({
+    const res = await axiosInstance({
       method: "POST",
-      // headers: { Authorization: `Bearer ${currentUser?.accessToken}` },
-      withCredentials: true,
-      url: `${import.meta.env.VITE_SERVER_BASE_URL}/api/v1/users/update`,
+      url: `/users/update`,
       data: {
         avatar: userData?.imageURL,
         password: userData?.password,

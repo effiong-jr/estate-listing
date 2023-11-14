@@ -1,20 +1,15 @@
-import axios from "axios";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useMutation } from "@tanstack/react-query";
 import { deleteCurrentUser } from "../../redux/features/user";
+import axiosInstance from "../../utils/axios";
 
 const useDeleteAccount = () => {
   const dispatch = useDispatch();
 
-  const accessToken = useSelector(
-    (state) => state.user.currentUser.accessToken
-  );
-
   const handleDeleteAccount = async () => {
-    const { data } = await axios({
-      headers: { Authorization: `Bearer ${accessToken}` },
+    const { data } = await axiosInstance({
       method: "DELETE",
-      url: `${import.meta.env.VITE_SERVER_BASE_URL}/api/v1/users/delete`,
+      url: `users/delete`,
     });
 
     return data;

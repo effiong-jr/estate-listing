@@ -1,17 +1,16 @@
-import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../../redux/features/user";
+import axiosInstance from "../../utils/axios";
 
 const useGoogle = () => {
   const dispatch = useDispatch();
 
   const handleAuthWithGoogle = async ({ email, photoURL }) => {
     //Call signin with google endpoint
-    const { data } = await axios({
+    const { data } = await axiosInstance({
       method: "POST",
-      withCredentials: true,
-      url: `${import.meta.env.VITE_SERVER_BASE_URL}/api/v1/users/google`,
+      url: `/users/google`,
       data: { email, photoURL },
     });
     return data;
