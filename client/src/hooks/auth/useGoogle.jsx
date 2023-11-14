@@ -10,6 +10,7 @@ const useGoogle = () => {
     //Call signin with google endpoint
     const { data } = await axios({
       method: "POST",
+      withCredentials: true,
       url: `${import.meta.env.VITE_SERVER_BASE_URL}/api/v1/users/google`,
       data: { email, photoURL },
     });

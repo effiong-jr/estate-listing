@@ -36,10 +36,17 @@ const handleLogin = async (req, res) => {
   // Generate Access token
   const accessToken = await generateAccessToken(sanitizedUser);
 
-  res.status(200).json({
-    message: "Login successful",
-    data: { userUserDetails: sanitizedUser, accessToken },
-  });
+  res
+    .cookie("accessToken", `Bearer ${accessToken}`, {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    })
+    .status(200)
+    .json({
+      message: "Login successful",
+      data: { userDetails: sanitizedUser },
+    });
 };
 
 export default handleLogin;

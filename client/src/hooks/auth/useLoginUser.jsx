@@ -8,13 +8,12 @@ const useLoginUser = () => {
   const dispatch = useDispatch();
 
   const loginUser = async (userData) => {
-    const res = await axios(
-      `${import.meta.env.VITE_SERVER_BASE_URL}/api/v1/users/login`,
-      {
-        method: "POST",
-        data: userData,
-      }
-    );
+    const res = await axios({
+      url: `${import.meta.env.VITE_SERVER_BASE_URL}/api/v1/users/login`,
+      method: "POST",
+      data: userData,
+      withCredentials: true,
+    });
 
     return res;
   };

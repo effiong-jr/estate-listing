@@ -30,10 +30,17 @@ const registerUser = async (req, res) => {
   // Generate access token
   const accessToken = await generateAccessToken(user);
 
-  res.status(201).json({
-    message: "Registration successful",
-    data: { userDetails: sanitizedUser, accessToken },
-  });
+  res
+    .cookie("accessToken", `Bearer ${accessToken}`, {
+      secure: true,
+      httpOnly: false,
+      sameSite: "none",
+    })
+    .status(201)
+    .json({
+      message: "Registration successful",
+      data: { userDetails: sanitizedUser },
+    });
 };
 
 export default registerUser;

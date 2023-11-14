@@ -42,13 +42,19 @@ const handleAuthWithGoogle = async (req, res, next) => {
   // Generate accessToken
   const accessToken = await generateAccessToken(user);
 
-  res.status(200).json({
-    message: "User authentication with Google successful",
-    data: {
-      userDetails: sanitizedUser,
-      accessToken,
-    },
-  });
+  res
+    .cookie("accessToken", `Bearer ${accessToken}`, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    })
+    .status(200)
+    .json({
+      message: "User authentication with Google successful",
+      data: {
+        userDetails: sanitizedUser,
+      },
+    });
 };
 
 export default handleAuthWithGoogle;

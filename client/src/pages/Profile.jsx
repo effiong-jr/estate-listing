@@ -136,7 +136,9 @@ const Profile = () => {
           <span className="cursor-pointer">Sign out</span>
         </div>
 
-        <p className="text-red-700 text-sm">{isError ? error.message : null}</p>
+        <p className="text-red-700 text-sm">
+          {isError ? error?.response?.data?.message : null}
+        </p>
       </form>
     </div>
   );
