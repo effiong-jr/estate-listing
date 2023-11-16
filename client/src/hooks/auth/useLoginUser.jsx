@@ -9,7 +9,7 @@ const useLoginUser = () => {
 
   const loginUser = async (userData) => {
     const res = await axiosInstance({
-      url: `/users/login`,
+      url: `/auth/login`,
       method: "POST",
       data: userData,
     });

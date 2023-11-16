@@ -9,7 +9,7 @@ const useLogout = () => {
   const handleLogout = async () => {
     const { data } = await axiosInstance({
       method: "POST",
-      url: "/users/logout",
+      url: "/auth/logout",
     });
 
     return data?.data;

@@ -10,7 +10,7 @@ const useGoogle = () => {
     //Call signin with google endpoint
     const { data } = await axiosInstance({
       method: "POST",
-      url: `/users/google`,
+      url: `/auth/google`,
       data: { email, photoURL },
     });
     return data;

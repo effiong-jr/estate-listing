@@ -7,7 +7,7 @@ const useRegisterUser = () => {
   const dispatch = useDispatch();
 
   const registerUser = async (userData) => {
-    const res = await axiosInstance(`/users/register`, {
+    const res = await axiosInstance(`/auth/register`, {
       method: "POST",
       data: userData,
     });

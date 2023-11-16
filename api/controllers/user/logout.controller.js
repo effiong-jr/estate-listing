@@ -1,6 +1,11 @@
 const handleLogout = async (req, res) => {
   res
-    .clearCookie("accessToken", { expires: new Date(1), secure: true })
+    .clearCookie("accessToken", {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+      maxAge: 0,
+    })
     .status(200)
     .json({
       message: "Signed out successfully",

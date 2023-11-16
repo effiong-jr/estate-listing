@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 
 import errorHandler from "./utils/errorHandler.js";
 import userRouter from "./routes/users.routes.js";
+import authRouter from "./routes/auth.routes.js";
 
 dotenv.config();
 
@@ -40,6 +41,8 @@ try {
 
 // Model Initialization
 import "./models/user.model.js";
+
+app.use("/api/v1/auth", authRouter);
 
 app.use("/api/v1/users", userRouter);
 
