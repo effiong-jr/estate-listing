@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
@@ -130,6 +131,13 @@ const Profile = () => {
         >
           {isPending ? "Loading..." : "Update"}
         </button>
+
+        <Link
+          to="/create-listing"
+          className="bg-green-700 w-full p-2 text-white text-center uppercase rounded-lg hover:bg-green-500 disabled:bg-green-300 disabled:hover:cursor-not-allowed"
+        >
+          Create Listing
+        </Link>
 
         <div className="text-red-700 flex justify-between w-full">
           <span

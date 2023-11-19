@@ -9,6 +9,7 @@ import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CreateListing from "./pages/CreateListing";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => {
           <Route path="/about" element={<About />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />
+            <Route path="/create-listing" element={<CreateListing />} />
           </Route>
         </Routes>
       </BrowserRouter>
