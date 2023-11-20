@@ -1,20 +1,96 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "../utils/firebase";
 
 const CreateListing = () => {
+  const [uploadedFiles, setUploadedFiles] = useState(null);
+  const [uploadImageError, setUploadImageError] = useState(null);
+  const [imagesURL, setImagesURL] = useState([]);
+  const [isStoringImage, setIsStoringImage] = useState(false);
+
   const { register, handleSubmit, watch } = useForm();
 
   const watchOffer = watch("offer");
   const watchType = watch("type");
 
+  const handleUploadImages = async () => {
+    const promises = [];
+
+    // Check number of images for upload
+    // Min: 1, max: 6
+    setUploadImageError(null);
+    if (!uploadedFiles || uploadedFiles.length === 0) {
+      setUploadImageError("Upload at least one image");
+      return;
+    } else if (
+      (uploadedFiles && uploadedFiles.length > 6) ||
+      uploadedFiles.length + imagesURL.length > 6
+    ) {
+      setUploadImageError("Maximum of 6 images allowed");
+      return;
+    }
+
+    setIsStoringImage(true);
+
+    for (let file of Object.values(uploadedFiles)) {
+      const res = await storeImage(file);
+      promises.push(res);
+    }
+
+    Promise.all(promises)
+      .then((imageUrl) => {
+        setImagesURL((prevData) => [...prevData, ...imageUrl]);
+      })
+      .catch((error) => {
+        setUploadImageError("Image upload failed");
+        console.log(error);
+      })
+      .finally(() => {
+        setIsStoringImage(false);
+      });
+  };
+
+  const storeImage = async (file) => {
+    const promiseResponse = new Promise((resolve, reject) => {
+      const storage = getStorage(app);
+
+      const listingImageRef = ref(storage, new Date().getTime() + file.name);
+
+      const uploadTask = uploadBytesResumable(listingImageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        },
+        (error) => {
+          reject(error);
+        },
+        async () => {
+          const imageURL = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(imageURL);
+        }
+      );
+    });
+
+    return promiseResponse;
+  };
+
   const handleCreateListing = (data) => {
     console.log(data);
   };
+
   return (
     <div className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
         Create a Listing
       </h1>
-
       <form
         onSubmit={handleSubmit(handleCreateListing)}
         className="flex flex-col sm:flex-row text-md gap-5"
@@ -189,23 +265,46 @@ const CreateListing = () => {
               The first image will be used as the cover. (max: 6 images)
             </span>
           </p>
-
           <div className="flex gap-4">
             <input
               type="file"
               accept="image/*"
               multiple
               className="p-3 rounded border border-gray-300 w-full"
-              {...register("images")}
+              {...register("images", {
+                onChange: (e) => setUploadedFiles(e.target.files),
+              })}
             />
-            <button className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80">
-              Upload
+            <button
+              type="button"
+              onClick={handleUploadImages}
+              className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80"
+            >
+              {isStoringImage ? "Uploading..." : "Upload"}
             </button>
           </div>
-
+          <p className="text-sm text-red-700 text-center">{uploadImageError}</p>
           <button className="bg-gray-700 hover:opacity-80 text-white uppercase rounded p-3 mt-3">
             Create Listing
           </button>
+
+          <div className="gap-5 flex flex-col">
+            {imagesURL.map((url) => (
+              <div
+                key={url}
+                className="rounded-lg flex justify-between border items-center p-3"
+              >
+                <img
+                  src={url}
+                  alt="listing img"
+                  className="object-contain  h-20 w-20"
+                />
+                <button className="text-red-700 hover:opacity-75 text-sm font-semibold">
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </form>
     </div>
