@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
+  //   deleteObject,
   getDownloadURL,
   getStorage,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../utils/firebase";
+import useCreateListing from "../hooks/user/useCreateListing";
 
 const CreateListing = () => {
   const [uploadedFiles, setUploadedFiles] = useState(null);
@@ -14,10 +16,31 @@ const CreateListing = () => {
   const [imagesURL, setImagesURL] = useState([]);
   const [isStoringImage, setIsStoringImage] = useState(false);
 
-  const { register, handleSubmit, watch } = useForm();
+  const defaultValues = {
+    name: "",
+    description: "",
+    address: "",
+    type: "rent",
+    furnished: true,
+    parking: false,
+    offer: false,
+    bedrooms: 1,
+    bathrooms: 1,
+    regularPrice: 0,
+    discountPrice: 0,
+  };
 
-  const watchOffer = watch("offer");
-  const watchType = watch("type");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setError,
+    formState: { errors, clearErrors },
+  } = useForm({
+    defaultValues,
+  });
+
+  const { mutate, isPending } = useCreateListing();
 
   const handleUploadImages = async () => {
     const promises = [];
@@ -57,10 +80,13 @@ const CreateListing = () => {
   };
 
   const storeImage = async (file) => {
-    const promiseResponse = new Promise((resolve, reject) => {
-      const storage = getStorage(app);
+    const storage = getStorage(app);
 
-      const listingImageRef = ref(storage, new Date().getTime() + file.name);
+    const promiseResponse = new Promise((resolve, reject) => {
+      const listingImageRef = ref(
+        storage,
+        new Date().getTime() + file.name.replaceAll(" ", "_")
+      );
 
       const uploadTask = uploadBytesResumable(listingImageRef, file);
 
@@ -82,8 +108,21 @@ const CreateListing = () => {
     return promiseResponse;
   };
 
+  const handleDeleteImage = (imageURL) => {
+    setImagesURL((prevData) => prevData.filter((url) => url != imageURL));
+    // const storage = getStorage(app);
+    // const imageRefForDelete = ref(storage, imageURL);
+
+    // deleteObject(imageRefForDelete)
+    //   .then(() => console.log("Image deleted successfully"))
+    //   .catch((error) => {
+    //     console.log("Error deleting Image", error);
+    //   });
+  };
+
   const handleCreateListing = (data) => {
-    console.log(data);
+    // console.log({ ...data, imageUrls: imagesURL });
+    mutate({ ...data, imageUrls: imagesURL });
   };
 
   return (
@@ -133,12 +172,13 @@ const CreateListing = () => {
               <input
                 type="radio"
                 name="type"
-                id="sell"
+                id="sale"
                 className="w-5"
-                value={"sell"}
+                value={"sale"}
+                checked={watch("type") === "sale"}
                 {...register("type")}
               />
-              <label htmlFor="sell">Sell</label>
+              <label htmlFor="sale">Sale</label>
             </div>
 
             <div className="flex gap-3">
@@ -147,6 +187,7 @@ const CreateListing = () => {
                 value={"rent"}
                 name="type"
                 id="rent"
+                checked={watch("type") === "rent"}
                 className="w-5"
                 {...register("type")}
               />
@@ -156,12 +197,13 @@ const CreateListing = () => {
             <div className="flex gap-3">
               <input
                 type="checkbox"
-                name="funished"
-                id="funished"
+                name="furnished"
+                id="furnished"
                 className="w-5"
-                {...register("funished")}
+                checked={watch("furnished") === true}
+                {...register("furnished")}
               />
-              <label htmlFor="funished">Funished</label>
+              <label htmlFor="furnished">Furnished</label>
             </div>
 
             <div className="flex gap-3">
@@ -193,28 +235,26 @@ const CreateListing = () => {
               <input
                 type="number"
                 className="w-12 h-8 text-center p-e-3 border-gray-700 border-2 rounded-lg"
-                {...register("beds", { required: true })}
+                {...register("bedrooms", { required: true })}
                 min={1}
                 max={99}
-                defaultValue={1}
-                id="beds"
-                name="beds"
+                id="bedrooms"
+                name="bedrooms"
               />
-              <label htmlFor="beds">Beds</label>
+              <label htmlFor="bedrooms">Bed Rooms</label>
             </div>
 
             <div className="flex items-center gap-2">
               <input
                 type="number"
                 className="w-12 h-8 text-center p-e-3 border-gray-700 border-2 rounded-lg"
-                {...register("baths", { required: true })}
+                {...register("bathrooms", { required: true })}
                 min={1}
                 max={99}
-                defaultValue={1}
-                id="baths"
-                name="baths"
+                id="bathrooms"
+                name="bathrooms"
               />
-              <label htmlFor="baths">Baths</label>
+              <label htmlFor="bathrooms">Bathrooms</label>
             </div>
 
             <div className="flex items-center gap-2">
@@ -229,32 +269,51 @@ const CreateListing = () => {
               />
               <label htmlFor="regularPrice" className="text-center">
                 <span className="block">Regular Price</span>
-                {watchType === "rent" && (
+                {watch("type") === "rent" && (
                   <span className="block text-sm">($ / month)</span>
                 )}
               </label>
             </div>
 
-            {watchOffer && (
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  className="w-28 h-8 text-center p-e-3 border-gray-700 border-2 rounded-lg"
-                  {...register("discountPrice", {
-                    required: watchOffer ? true : false,
-                  })}
-                  min={0}
-                  defaultValue={0}
-                  id="discountPrice"
-                  name="discountPrice"
-                />
-                <label htmlFor="discountPrice" className="text-center">
-                  <span className="block">Discounted Price</span>
-                  {watchType === "rent" && (
-                    <span className="block text-sm">($ / month)</span>
-                  )}
-                </label>
-              </div>
+            {watch("offer") && (
+              <>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    className="w-28 h-8 text-center p-e-3 border-gray-700 border-2 rounded-lg"
+                    {...register("discountPrice", {
+                      required: watch("offer") ? true : false,
+                    })}
+                    min={0}
+                    // id="discountPrice"
+                    // name="discountPrice"
+                    onChange={(e) => {
+                      const discountPriceValue = e.target.value;
+                      const regularPrice = Number(watch("regularPrice"));
+                      if (discountPriceValue > regularPrice) {
+                        setError("discountPrice", {
+                          message:
+                            "Discounted price should be less than original price",
+                        });
+                      } else {
+                        clearErrors();
+                      }
+                    }}
+                  />
+                  <label htmlFor="discountPrice" className="text-center">
+                    <span className="block">Discounted Price</span>
+                    {watch("type") === "rent" && (
+                      <span className="block text-sm">($ / month)</span>
+                    )}
+                  </label>
+                </div>
+
+                {errors.discountPrice && (
+                  <p className="text-xs text-red-700 font-semibold">
+                    {errors.discountPrice.message}
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -270,6 +329,7 @@ const CreateListing = () => {
               type="file"
               accept="image/*"
               multiple
+              required
               className="p-3 rounded border border-gray-300 w-full"
               {...register("images", {
                 onChange: (e) => setUploadedFiles(e.target.files),
@@ -277,6 +337,7 @@ const CreateListing = () => {
             />
             <button
               type="button"
+              disabled={isStoringImage}
               onClick={handleUploadImages}
               className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80"
             >
@@ -284,8 +345,11 @@ const CreateListing = () => {
             </button>
           </div>
           <p className="text-sm text-red-700 text-center">{uploadImageError}</p>
-          <button className="bg-gray-700 hover:opacity-80 text-white uppercase rounded p-3 mt-3">
-            Create Listing
+          <button
+            disabled={isPending}
+            className="bg-gray-700 hover:opacity-80 text-white uppercase rounded p-3 mt-3 disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {isPending ? "Creating..." : "Create Listing"}
           </button>
 
           <div className="gap-5 flex flex-col">
@@ -299,7 +363,11 @@ const CreateListing = () => {
                   alt="listing img"
                   className="object-contain  h-20 w-20"
                 />
-                <button className="text-red-700 hover:opacity-75 text-sm font-semibold">
+                <button
+                  type="button"
+                  onClick={() => handleDeleteImage(url)}
+                  className="text-red-700 hover:opacity-75 text-sm font-semibold"
+                >
                   Delete
                 </button>
               </div>
