@@ -15,9 +15,8 @@ const useCreateListing = () => {
 
   const mutateCreateListing = useMutation({
     mutationFn: handleCreateListing,
-    onSuccess: (res) => {
-      const listingId = res.data?.data?.listing._id;
-      navigate(`/listing/${listingId}`);
+    onSuccess: () => {
+      navigate(`/listings`);
     },
   });
 
