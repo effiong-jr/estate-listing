@@ -14,6 +14,7 @@ import { app } from "../utils/firebase";
 import useUpdateUser from "../hooks/user/useUpdateUser";
 import useDeleteAccount from "../hooks/user/useDeleteAccount";
 import useLogout from "../hooks/auth/useLogout";
+import useGetUserListings from "../hooks/user/useGetUserListings";
 
 const Profile = () => {
   const [file, setFile] = useState(null);
@@ -27,6 +28,11 @@ const Profile = () => {
   const { mutate: mutateDeleteUser, isPending: isDeletingUser } =
     useDeleteAccount();
   const { mutate: mutateLogout } = useLogout();
+
+  const { refetch: refetchGetUserListings, data: userListings } =
+    useGetUserListings();
+
+  console.log(userListings);
 
   const { register, handleSubmit } = useForm();
 
@@ -73,6 +79,10 @@ const Profile = () => {
 
   const handleSignOut = () => {
     mutateLogout();
+  };
+
+  const handleShowListings = () => {
+    refetchGetUserListings();
   };
 
   return (
@@ -156,6 +166,57 @@ const Profile = () => {
           {isError ? error?.response?.data?.message : null}
         </p>
       </form>
+
+      <div
+        className="mx-auto w-max mt-4 text-green-700 hover:cursor-pointer"
+        onClick={handleShowListings}
+      >
+        Show listings
+      </div>
+
+      {/* Listings */}
+      <div className="flex flex-col gap-4 max-w-2xl mx-auto p-4">
+        {userListings?.length > 0 && (
+          <h1 className="font-semibold text-2xl text-center my-4 ">
+            Your Listings
+          </h1>
+        )}
+
+        {(userListings || []).map((listing) => (
+          <div
+            key={listing._id}
+            className="flex justify-between items-center border rounded-lg p-3"
+          >
+            <div className="border flex">
+              <Link to={`/listing/${listing._id}`}>
+                <img
+                  src={listing.imageUrls[0]}
+                  className="object-center object-fill h-16 w-16"
+                />
+              </Link>
+            </div>
+            <div className="text-slate-700 font-semibold flex flex-1 truncate text-center justify-center">
+              <Link to={`/listing/${listing._id}`} className="truncate mx-3">
+                {listing.name}
+              </Link>
+            </div>
+            <div className="space-y-3">
+              <button
+                type="button"
+                className="text-green-700 uppercase text-sm font-semibold block"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                className="text-red-700 uppercase text-sm font-semibold block"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
