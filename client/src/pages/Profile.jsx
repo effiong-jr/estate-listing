@@ -15,6 +15,7 @@ import useUpdateUser from "../hooks/user/useUpdateUser";
 import useDeleteAccount from "../hooks/user/useDeleteAccount";
 import useLogout from "../hooks/auth/useLogout";
 import useGetUserListings from "../hooks/user/useGetUserListings";
+import useDeleteListing from "../hooks/user/useDeleteListing";
 
 const Profile = () => {
   const [file, setFile] = useState(null);
@@ -32,7 +33,7 @@ const Profile = () => {
   const { refetch: refetchGetUserListings, data: userListings } =
     useGetUserListings();
 
-  console.log(userListings);
+  const { mutate: mutateDeleteListing } = useDeleteListing();
 
   const { register, handleSubmit } = useForm();
 
@@ -83,6 +84,10 @@ const Profile = () => {
 
   const handleShowListings = () => {
     refetchGetUserListings();
+  };
+
+  const handleDeleteListing = (listingId) => {
+    mutateDeleteListing(listingId);
   };
 
   return (
@@ -210,6 +215,7 @@ const Profile = () => {
               <button
                 type="button"
                 className="text-red-700 uppercase text-sm font-semibold block"
+                onClick={() => handleDeleteListing(listing._id)}
               >
                 Delete
               </button>
