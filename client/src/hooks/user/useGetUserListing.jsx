@@ -7,7 +7,7 @@ const useGetUserListing = (listingId) => {
       url: `/listings/${listingId}`,
     });
 
-    return data?.data;
+    return data?.data?.listing;
   };
 
   const getListing = useQuery({

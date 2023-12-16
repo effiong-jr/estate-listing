@@ -7,8 +7,8 @@ const useUpdateListing = () => {
 
   const handleUpdateListing = async (newListing) =>
     await axiosInstance({
-      method: "POST",
-      url: "/listings/update",
+      method: "PUT",
+      url: `/listings/update/${newListing._id}`,
       data: newListing,
     });
 

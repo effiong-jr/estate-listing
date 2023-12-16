@@ -20,12 +20,15 @@ const CreateListing = () => {
   const [isStoringImage, setIsStoringImage] = useState(false);
 
   const location = useLocation();
+  const { pathname } = location;
+  const isUpdateScreen = pathname.includes("update-listing");
 
   const { id: listingId } = useParams();
 
-  const { pathname } = location;
-
-  const isUpdateScreen = pathname.includes("update-listing");
+  const { data: listingRes } = useGetUserListing(listingId);
+  const { mutate, isPending } = useCreateListing();
+  const { mutate: mutateUpdateListing, isPending: isPendingUpdateListing } =
+    useUpdateListing();
 
   const defaultValues = {
     name: "",
@@ -48,15 +51,8 @@ const CreateListing = () => {
     setError,
     formState: { errors, clearErrors },
   } = useForm({
-    defaultValues,
+    defaultValues: async () => listingRes || defaultValues,
   });
-
-  const { data: listingResponse } = useGetUserListing(listingId);
-  const { mutate, isPending } = useCreateListing();
-  const { mutate: mutateUpdateListing, isPending: isPendingUpdateListing } =
-    useUpdateListing();
-
-  console.log(listingResponse);
 
   const handleUploadImages = async () => {
     const promises = [];
@@ -142,8 +138,10 @@ const CreateListing = () => {
   };
 
   const handleUpdateListing = (data) => {
-    console.log(data);
-    mutateUpdateListing({ ...data, imageUrls: imagesURL });
+    mutateUpdateListing({
+      ...data,
+      imageUrls: [...new Set([...imagesURL, ...listingRes.imageUrls])],
+    });
   };
 
   return (
@@ -352,7 +350,7 @@ const CreateListing = () => {
               type="file"
               accept="image/*"
               multiple
-              required
+              required={isUpdateScreen ? false : true}
               className="p-3 rounded border border-gray-300 w-full"
               {...register("images", {
                 onChange: (e) => setUploadedFiles(e.target.files),
@@ -382,7 +380,7 @@ const CreateListing = () => {
           </button>
 
           <div className="gap-5 flex flex-col">
-            {imagesURL.map((url) => (
+            {(listingRes?.imageUrls || imagesURL).map((url) => (
               <div
                 key={url}
                 className="rounded-lg flex justify-between border items-center p-3"
