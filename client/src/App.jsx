@@ -26,6 +26,7 @@ const App = () => {
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />
             <Route path="/create-listing" element={<CreateListing />} />
+            <Route path="/update-listing/:id" element={<CreateListing />} />
           </Route>
         </Routes>
       </BrowserRouter>

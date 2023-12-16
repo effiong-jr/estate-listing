@@ -39,6 +39,8 @@ const Profile = () => {
 
   const fileRef = useRef(null);
 
+  console.log(location);
+
   useEffect(() => {
     if (file) {
       handleUpload(file);
@@ -206,12 +208,14 @@ const Profile = () => {
               </Link>
             </div>
             <div className="space-y-3">
-              <button
-                type="button"
-                className="text-green-700 uppercase text-sm font-semibold block"
-              >
-                Edit
-              </button>
+              <Link to={`/update-listing/${listing._id}`}>
+                <button
+                  type="button"
+                  className="text-green-700 uppercase text-sm font-semibold block"
+                >
+                  Edit
+                </button>
+              </Link>
               <button
                 type="button"
                 className="text-red-700 uppercase text-sm font-semibold block"

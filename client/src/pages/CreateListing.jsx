@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useLocation, useParams } from "react-router-dom";
 import {
   //   deleteObject,
   getDownloadURL,
@@ -9,12 +10,22 @@ import {
 } from "firebase/storage";
 import { app } from "../utils/firebase";
 import useCreateListing from "../hooks/user/useCreateListing";
+import useUpdateListing from "../hooks/user/useUpdateListing";
+import useGetUserListing from "../hooks/user/useGetUserListing";
 
 const CreateListing = () => {
   const [uploadedFiles, setUploadedFiles] = useState(null);
   const [uploadImageError, setUploadImageError] = useState(null);
   const [imagesURL, setImagesURL] = useState([]);
   const [isStoringImage, setIsStoringImage] = useState(false);
+
+  const location = useLocation();
+
+  const { id: listingId } = useParams();
+
+  const { pathname } = location;
+
+  const isUpdateScreen = pathname.includes("update-listing");
 
   const defaultValues = {
     name: "",
@@ -40,7 +51,12 @@ const CreateListing = () => {
     defaultValues,
   });
 
+  const { data: listingResponse } = useGetUserListing(listingId);
   const { mutate, isPending } = useCreateListing();
+  const { mutate: mutateUpdateListing, isPending: isPendingUpdateListing } =
+    useUpdateListing();
+
+  console.log(listingResponse);
 
   const handleUploadImages = async () => {
     const promises = [];
@@ -125,13 +141,20 @@ const CreateListing = () => {
     mutate({ ...data, imageUrls: imagesURL });
   };
 
+  const handleUpdateListing = (data) => {
+    console.log(data);
+    mutateUpdateListing({ ...data, imageUrls: imagesURL });
+  };
+
   return (
     <div className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
-        Create a Listing
+        {isUpdateScreen ? `Update` : "Create a"} Listing
       </h1>
       <form
-        onSubmit={handleSubmit(handleCreateListing)}
+        onSubmit={handleSubmit(
+          isUpdateScreen ? handleUpdateListing : handleCreateListing
+        )}
         className="flex flex-col sm:flex-row text-md gap-5"
       >
         <div className="flex flex-col gap-4 flex-1">
@@ -349,7 +372,13 @@ const CreateListing = () => {
             disabled={isPending}
             className="bg-gray-700 hover:opacity-80 text-white uppercase rounded p-3 mt-3 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {isPending ? "Creating..." : "Create Listing"}
+            {isUpdateScreen
+              ? isPendingUpdateListing
+                ? "Updating..."
+                : "Update Listing"
+              : isPending
+              ? "Creating..."
+              : "Create Listing"}
           </button>
 
           <div className="gap-5 flex flex-col">
